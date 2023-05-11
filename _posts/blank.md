@@ -8,4 +8,6 @@ tags:
   - ABCA4
   - RCD
   - IRD
+  - academic
+  - general
 ---

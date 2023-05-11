@@ -6,4 +6,5 @@ abstract: Researchers from Basel and Zurich are creating a high-​resolution at
 notes: Very cool! The atlas could support research to halt the progression of a degenerative eye disease that can cause people lose their sight.
 tags:
   - phenotyping
+  - general
 ---
