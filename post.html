@@ -113,10 +113,19 @@
         }
 
         document.getElementById('save-button').onclick = async function() {
-            const titleValue = document.getElementById('title').value;
-            const originalUrlValue = document.getElementById('original_url').value;
-            const abstractValue = document.getElementById('abstract').value;
-            const tagsValue = document.getElementById('tags').value.replace(/,\s/g, '\n  - ');
+            let titleValue = document.getElementById('title').value;
+            let originalUrlValue = document.getElementById('original_url').value;
+            let abstractValue = document.getElementById('abstract').value;
+            let tagsValue = document.getElementById('tags').value;
+
+            // Remove all line breaks from the abstract input
+            abstractValue = abstractValue.replace(/(\r\n|\n|\r)/gm, ' ');
+
+            // Remove colons from all fields
+            titleValue = titleValue.replace(/:/g, '');
+            originalUrlValue = originalUrlValue.replace(/:/g, '');
+            abstractValue = abstractValue.replace(/:/g, '');
+            tagsValue = tagsValue.replace(/:/g, '').replace(/,\s/g, '\n  - ');
 
             const textToSave =
                 '---\n' +
