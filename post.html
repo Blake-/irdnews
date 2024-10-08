@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Post</title>
+    <style>
+        body {
+            font-family: verdana, sans-serif;
+            color: #666;
+            background: #fafafa;
+            padding: 20px;
+            text-align: center;
+        }
+        #page {
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 16px;
+            font-weight: normal;
+            text-align: center;
+        }
+        label {
+            font-size: 16px;
+        }
+        label i {
+            font-style: normal;
+            display: inline-block;
+            text-align: right;
+            width: 100px;
+        }
+        button {
+            margin-top: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        input, textarea {
+            width: 400px;
+            font-size: 16px;
+            margin: 0 0 5px 0;
+            padding: 5px;
+            border: 1px solid #eee;
+        }
+        @media (max-width: 768px) {
+            input, textarea {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="page">
+        <h1>New Post</h1>
+        
+        <label for="title">
+            <i>Title</i>
+            <input id="title" size="40" placeholder="Title" required oninput="updateFilename()">
+        </label><br>
+        
+        <label for="original_url">
+            <i>Original URL</i>
+            <input id="original_url" size="40" placeholder="Original URL" required>
+        </label><br>
+
+        <label for="abstract">
+            <i>Abstract</i>
+            <textarea id="abstract" cols="40" rows="3" placeholder="Abstract" required></textarea>
+        </label><br>
+
+        <label for="tags">
+            <i>Tags</i>
+            <textarea id="tags" cols="40" rows="3" placeholder="tag, tag, tag"></textarea>
+        </label><br>
+
+        <label for="filename">
+            <i>Filename</i>
+            <input id="filename" size="40" placeholder="Filename" readonly>
+        </label><br>
+
+        <button id="save-button">Save to File</button>
+    </div>
+
+    <script>
+        // Current date
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; // January is 0!
+        var yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        today = yyyy + '-' + mm + '-' + dd;
+
+        function updateFilename() {
+            var titleValue = document.getElementById('title').value;
+            var slugifiedTitle = slugify(titleValue);
+            document.getElementById('filename').value = today + '-' + slugifiedTitle + '.md';
+        }
+
+        function slugify(input) {
+            if (!input) return '';
+            var slug = input.toLowerCase().trim();
+            slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            slug = slug.replace(/[^a-z0-9\s-]/g, ' ').trim();
+            slug = slug.replace(/[\s-]+/g, '-');
+            return slug;
+        }
+
+        document.getElementById('save-button').onclick = async function() {
+            const titleValue = document.getElementById('title').value;
+            const originalUrlValue = document.getElementById('original_url').value;
+            const abstractValue = document.getElementById('abstract').value;
+            const tagsValue = document.getElementById('tags').value.replace(/,\s/g, '\n  - ');
+
+            const textToSave =
+                '---\n' +
+                'layout: post\n' +
+                'title: ' + titleValue + '\n' +
+                'original_url: ' + originalUrlValue + '\n' +
+                'abstract: ' + abstractValue + '\n' +
+                'tags:\n' +
+                (tagsValue ? '  - ' + tagsValue : '') + '\n' + // Add tags if provided
+                '---\n\n';
+
+            // Create a new file handle
+            const options = {
+                types: [{
+                    description: 'Markdown Files',
+                    accept: { 'text/markdown': ['.md'] }
+                }],
+                suggestedName: document.getElementById('filename').value // Set the suggested name for the file
+            };
+
+            // Prompt user for a file handle
+            const fileHandle = await window.showSaveFilePicker(options);
+
+            // Create a writable stream
+            const writable = await fileHandle.createWritable();
+
+            // Write the contents to the file
+            await writable.write(textToSave);
+
+            // Close the file and write the contents to disk
+            await writable.close();
+        };
+    </script>
+</body>
+</html>
